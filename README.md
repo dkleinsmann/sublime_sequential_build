@@ -12,6 +12,8 @@ If working_dir is left blank. The directory of the currently open file will be
 used.
 Warning: If working_dir is a relative path, it is relative to the location of the
 installed plugin.
+Warning: The environment variables (ie $project_path) cannot currently be used
+in the individual steps.
 
 An Example build system using multiple build steps:
 
@@ -32,7 +34,7 @@ An Example build system using multiple build steps:
 	            "cmd": ["make", "install"]
 	        },
 	        {
-	            "working_dir": "${project_path}/bin",
+	            "working_dir": "bin",
 	            "cmd": ["./main", "--id", "1"],
 	        }
 	    ]

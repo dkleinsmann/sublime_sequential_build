@@ -7,7 +7,8 @@ import copy
 #  class
 import sys, os
 sys.path.append(os.path.join(sublime.packages_path(), 'Default'))
-ExecCommand = getattr(__import__("exec", fromlist="ExecCommand"), 'ExecCommand')
+ExecCommand = getattr( __import__("exec", fromlist="ExecCommand"),
+                       'ExecCommand' )
 sys.path.remove(os.path.join(sublime.packages_path(), 'Default'))
 # Import done
 
@@ -24,12 +25,19 @@ class NotifyingExecCommand(ExecCommand):
     #  when the build is complete
     def on_finished(self, proc):
 
+        # Retreive the exit code of command. This will decide if the next
+        #  command should be run.
+        exit_code = proc.exit_code()
+
         # Do the superclass on_finished() first
         ExecCommand.on_finished( self, proc )
 
-        # Then issue our callback to the main thread using set_timeout
-        if hasattr(self.callback, '__call__'):
-            sublime.set_timeout(functools.partial(self.callback), 0)
+        # Only start the next build step if this one was successful
+        if exit_code == 0 or exit_code == None:
+
+            # Issue the callback to the main thread using set_timeout
+            if hasattr(self.callback, '__call__'):
+                sublime.set_timeout( functools.partial(self.callback), 0 )
 
 # This is the Command class called when a build system sets the
 #  target to "sequential_builder".
