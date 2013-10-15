@@ -7,16 +7,18 @@ system.
 To use the plugin set the "target" attribute to "sequential_builder" and
 insert a list of build steps.
 
-Also it is required that the working_dir path be set as an absolute path.
+It is required that the working_dir path be set as an absolute path.
 If working_dir is left blank. The directory of the currently open file will be
 used.
-Warning: If working_dir is a relative path, it is relative to the location of the
-installed plugin.
-Warning: The environment variables (ie $project_path) cannot currently be used
-in the individual steps.
 
-An Example build system using multiple build steps:
+Warning: If working_dir is specified as a relative path, it is relative to 
+the location of the installed plugin.
 
+Warning: The build system variables (ie $project_path) cannot be used in 
+individual build steps. The reason for this is that they are resolved outside
+of the python plugin framework.
+
+An example build system using multiple build steps:
 ```JSON
 "build_systems":
 [
