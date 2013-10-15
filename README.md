@@ -15,6 +15,7 @@ installed plugin.
 
 An Example build system using multiple build steps:
 
+```JSON
 "build_systems":
 [
 	{
@@ -37,3 +38,4 @@ An Example build system using multiple build steps:
 	    ]
 	}
 ]
+```
