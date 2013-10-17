@@ -47,7 +47,7 @@ class SequentialBuilderCommand(sublime_plugin.WindowCommand):
     def run(self, **args):
 
         # Take the 'build_sequence' argument from the build system
-        build_sequence = args.pop("build_sequence")
+        build_sequence = args.pop("build_sequence", None)
 
         # Confirm it's a list ([] in the JSON description)
         if isinstance(build_sequence, list):
@@ -87,14 +87,39 @@ class SequentialBuilderCommand(sublime_plugin.WindowCommand):
         if ( index < len(self.build_sequence) ):
 
             # Take a copy of the default attributes for this build step
-            step_args = copy.deepcopy( self.mainArgs )
+            args = copy.deepcopy( self.mainArgs )
 
-            # And update them with step specific attributes
-            step_args.update( self.build_sequence[index] )
+            # Get the step specific options
+            step_args = self.build_sequence[index]
+
+            # And double check that the user hasn't tried to use
+            # ${project_path} or any other variables
+            for key, value in step_args.items():
+                if type(value) is unicode and \
+                   "regex" not in key         \
+                   and "$" in value:
+                    sublime.error_message( "Error: Sequential Builder cannot "
+                        "use variables." )
+                    return
+
+            # If the build step has a working_dir argument, we may have to
+            #  do a little more work
+            if ( step_args.has_key( 'working_dir' ) ):
+
+                # We relative paths as relative to the top level working_dir
+                #  path.
+                if not os.path.isabs( step_args['working_dir'] ):
+                    step_args['working_dir'] = os.path.join(
+                        args['working_dir'], step_args['working_dir'] )
+
+            # Here we update any step specific options
+            args.update( step_args )
+            args['working_dir'] = os.path.abspath(args['working_dir'])
 
             # Run the command
-            print "Build Step (%d): %s" % (index+1, step_args)
+            print "Build Step (%d): %s" % (index+1, args)
             try:
-                self.window.run_command("notifying_exec", step_args)
+                self.window.run_command("notifying_exec", args)
             except:
-                sublime.error_message("Error: Sequential Builder triggered an error")
+                sublime.error_message( "Error: Sequential Builder triggered an"
+                    " unexpected error" )
