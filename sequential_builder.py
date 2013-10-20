@@ -196,15 +196,16 @@ class SequentialBuilderCommand(sublime_plugin.WindowCommand):
 
             # Relative paths are relative to the top level working_dir
             #  path.
-            if step_args.has_key( 'working_dir' ) and \
-               not os.path.isabs( step_args['working_dir'] ):
-                step_args['working_dir'] = os.path.join(
-                    args['working_dir'],
-                    step_args['working_dir'] )
+            if 'working_dir' in step_args:
+                if not os.path.isabs( step_args['working_dir'] ):
+                    step_args['working_dir'] = os.path.join(
+                        args['working_dir'],
+                        step_args['working_dir'] )
 
             # Here we update any step specific options
             args.update( step_args )
-            args['working_dir'] = os.path.abspath(args['working_dir'])
+            if 'working_dir' in args:
+                args['working_dir'] = os.path.abspath(args['working_dir'])
 
             # Run the command
             print( "Build Step (%d): %s" % (index+1, args) )
